@@ -19,18 +19,67 @@
 - (void)viewDidLoad {
     [super viewDidLoad];
     // Do any additional setup after loading the view, typically from a nib.
-    self.navigationItem.leftBarButtonItem = self.editButtonItem;
-
-    UIBarButtonItem *addButton = [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemAdd target:self action:@selector(insertNewObject:)];
-    self.navigationItem.rightBarButtonItem = addButton;
-    self.detailViewController = (DetailViewController *)[[self.splitViewController.viewControllers lastObject] topViewController];
+    
+    // I need my URL
+    // GET the data
+    
+    // Setup the url request using the url and the http method
+    NSURL *url = [NSURL URLWithString:@"https://api.github.com/users/lighthouse-labs/repos"];
+    NSMutableURLRequest *urlRequest = [NSMutableURLRequest requestWithURL:url];
+    urlRequest.HTTPMethod = @"GET";
+    
+    // SEtup a url session so we can make a request
+    NSURLSessionConfiguration *configuration = [NSURLSessionConfiguration defaultSessionConfiguration];
+    NSURLSession *urlSession = [NSURLSession sessionWithConfiguration:configuration];
+    
+    // Data task, and the download task
+    // Create a task to make the request
+    NSURLSessionDataTask *dataTask = [urlSession dataTaskWithRequest:urlRequest completionHandler:^(NSData * _Nullable data, NSURLResponse * _Nullable response, NSError * _Nullable error) {
+        
+        // We are already on a background queue
+        
+        // Here is where I can access the HTTP data
+        // Status codes, and JSON
+        
+        // If we don't get a 200 status code, error will not be nil
+        if (error) {
+            // something went wrong
+            // checking the status code
+            NSLog(@"Error getting data");
+        } else {
+            // Everything is great, let's do something with the data
+            
+            NSError *jsonError = nil;
+            NSArray *repos = [NSJSONSerialization JSONObjectWithData:data options:0 error:&jsonError];
+            
+            if (jsonError) { // 3
+                // Handle the error
+                NSLog(@"jsonError: %@", jsonError.localizedDescription);
+            } else {
+                // We now have our data as Objective-C data
+               
+                for (NSDictionary *repo in repos) {
+                    NSLog(@"repo name: %@", repo[@"name"]);
+                }
+                
+                self.objects = repos;
+                
+                // Tell the main queue, tell my UI Assistant
+                // To update something, in this case the table view
+                dispatch_async(dispatch_get_main_queue(), ^{
+                    [self.tableView reloadData];
+                });
+            }
+        }
+        
+    }];
+    
+    [dataTask resume]; // Like saying start my request
+    
+    NSLog(@"view did load");
 }
 
 
-- (void)viewWillAppear:(BOOL)animated {
-    self.clearsSelectionOnViewWillAppear = self.splitViewController.isCollapsed;
-    [super viewWillAppear:animated];
-}
 
 
 - (void)didReceiveMemoryWarning {
@@ -38,15 +87,6 @@
     // Dispose of any resources that can be recreated.
 }
 
-
-- (void)insertNewObject:(id)sender {
-    if (!self.objects) {
-        self.objects = [[NSMutableArray alloc] init];
-    }
-    [self.objects insertObject:[NSDate date] atIndex:0];
-    NSIndexPath *indexPath = [NSIndexPath indexPathForRow:0 inSection:0];
-    [self.tableView insertRowsAtIndexPaths:@[indexPath] withRowAnimation:UITableViewRowAnimationAutomatic];
-}
 
 
 #pragma mark - Segues
@@ -78,26 +118,10 @@
 - (UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath {
     UITableViewCell *cell = [tableView dequeueReusableCellWithIdentifier:@"Cell" forIndexPath:indexPath];
 
-    NSDate *object = self.objects[indexPath.row];
-    cell.textLabel.text = [object description];
+    NSDictionary *repo = self.objects[indexPath.row];
+    
+    cell.textLabel.text = repo[@"name"];
     return cell;
 }
-
-
-- (BOOL)tableView:(UITableView *)tableView canEditRowAtIndexPath:(NSIndexPath *)indexPath {
-    // Return NO if you do not want the specified item to be editable.
-    return YES;
-}
-
-
-- (void)tableView:(UITableView *)tableView commitEditingStyle:(UITableViewCellEditingStyle)editingStyle forRowAtIndexPath:(NSIndexPath *)indexPath {
-    if (editingStyle == UITableViewCellEditingStyleDelete) {
-        [self.objects removeObjectAtIndex:indexPath.row];
-        [tableView deleteRowsAtIndexPaths:@[indexPath] withRowAnimation:UITableViewRowAnimationFade];
-    } else if (editingStyle == UITableViewCellEditingStyleInsert) {
-        // Create a new instance of the appropriate class, insert it into the array, and add a new row to the table view.
-    }
-}
-
 
 @end

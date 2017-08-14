@@ -54,6 +54,7 @@
 		22AB4CC31F41FB4800ADC610 /* NetworkingUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = NetworkingUITests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		22AB4CC71F41FB4800ADC610 /* NetworkingUITests.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = NetworkingUITests.m; sourceTree = "<group>"; };
 		22AB4CC91F41FB4800ADC610 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		22AB4CD51F41FB6C00ADC610 /* class-notes.md */ = {isa = PBXFileReference; lastKnownFileType = net.daringfireball.markdown; path = "class-notes.md"; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -84,6 +85,7 @@
 		22AB4C941F41FB4800ADC610 = {
 			isa = PBXGroup;
 			children = (
+				22AB4CD51F41FB6C00ADC610 /* class-notes.md */,
 				22AB4C9F1F41FB4800ADC610 /* Networking */,
 				22AB4CBB1F41FB4800ADC610 /* NetworkingTests */,
 				22AB4CC61F41FB4800ADC610 /* NetworkingUITests */,
